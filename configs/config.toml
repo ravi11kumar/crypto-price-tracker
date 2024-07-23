@@ -1,5 +1,0 @@
-[server]
-port = "8081"
-
-[cache]
-expiry = "30s"

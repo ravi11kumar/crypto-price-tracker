@@ -1,11 +1,12 @@
 package utils
 
 import (
+	"encoding/json"
 	"errors"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"log"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -14,15 +15,17 @@ var ExpiryDuration time.Duration
 var configData map[string]interface{}
 
 func LoadConfig() {
-	yamlFile, err := ioutil.ReadFile("configs/config.yml")
+	jsonFile, err := os.ReadFile("configs/config.json")
 	if err != nil {
-		log.Fatalf("Error reading config.yml: %v", err)
+		log.Fatalf("Error reading config.json: %v", err)
 	}
 
-	err = yaml.Unmarshal(yamlFile, &configData)
+	err = json.Unmarshal(jsonFile, &configData)
 	if err != nil {
-		log.Fatalf("Error parsing config.yml: %v", err)
+		log.Fatalf("Error parsing config.json: %v", err)
 	}
+
+	log.Printf("Loaded configuration: %+v", configData) // Debug log
 
 	expiry, err := time.ParseDuration(Get(CacheExpiry))
 	if err != nil {
@@ -67,15 +70,23 @@ func GetOptional(key ConfigKey) (string, bool) {
 }
 
 func getConfigValue(key ConfigKey) (string, error) {
-	keys := string(key)
-	val, ok := configData[keys]
-	if !ok {
-		return "", errors.New("configuration value not found [" + keys + "]")
+	keys := strings.Split(string(key), ".")
+	var val interface{} = configData
+	for _, k := range keys {
+		log.Printf("Accessing key: %s", k) // Debug log
+		m, ok := val.(map[string]interface{})
+		if !ok {
+			return "", errors.New("configuration value not found [" + string(key) + "]")
+		}
+		val, ok = m[k]
+		if !ok {
+			return "", errors.New("configuration value not found [" + string(key) + "]")
+		}
 	}
 
 	strVal, ok := val.(string)
 	if !ok {
-		return "", errors.New("configuration value not a string [" + keys + "]")
+		return "", errors.New("configuration value not a string [" + string(key) + "]")
 	}
 
 	return strVal, nil

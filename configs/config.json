@@ -1,0 +1,11 @@
+{
+  "server": {
+    "port": "8081"
+  },
+  "cache": {
+    "expiry": "30s"
+  },
+  "baseApiUrls": {
+    "coindesk": "https://api.coindesk.com/v1/bpi/currentprice.json"
+  }
+}
