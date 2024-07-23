@@ -15,6 +15,7 @@ type PriceService struct {
 	cache      *models.Price
 	lastUpdate time.Time
 	mu         sync.Mutex
+	endpoint   string
 }
 
 func NewPriceService() *PriceService {
