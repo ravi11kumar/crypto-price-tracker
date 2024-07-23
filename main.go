@@ -8,7 +8,7 @@ import (
 func main() {
 	utils.LoadConfig()
 	r := handlers.SetupRouter()
-	err := r.Run(":" + utils.Config.Server.Port)
+	err := r.Run(":" + utils.Get(utils.ServerPort))
 	if err != nil {
 		return
 	}
