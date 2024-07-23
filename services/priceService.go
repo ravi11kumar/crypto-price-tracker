@@ -15,7 +15,6 @@ type PriceService struct {
 	cache      *models.Price
 	lastUpdate time.Time
 	mu         sync.Mutex
-	endpoint   string
 }
 
 func NewPriceService() *PriceService {
@@ -30,7 +29,7 @@ func (s *PriceService) GetPrice() (*models.Price, error) {
 		return s.cache, nil
 	}
 
-	response, err := http.Get("https://api.coindesk.com/v1/bpi/currentprice.json")
+	response, err := http.Get(utils.Get(utils.BaseApiUrl))
 	if err != nil {
 		return nil, err
 	}
